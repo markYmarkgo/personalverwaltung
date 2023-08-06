@@ -1,123 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import csv
-import re
-from itertools import islice
 
-class DialogNeuePerson(tk.Toplevel):
-    def __init__(self, parent, bearbeiten=False, person_data=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.bearbeiten = bearbeiten
-        self.person_data = person_data
+from DialogNeuePerson import DialogNeuePerson
 
-        self.title("Neue Person anlegen" if not bearbeiten else "Person bearbeiten")
-        self.geometry("400x350")
-
-        self.vorname_var = tk.StringVar()
-        self.nachname_var = tk.StringVar()
-        self.strasse_var = tk.StringVar()
-        self.plz_var = tk.StringVar()
-        self.ort_var = tk.StringVar()
-        self.telefonnummer_var = tk.StringVar()
-        self.email_var = tk.StringVar()
-
-        self.erstelle_gui()
-
-        if bearbeiten and person_data:
-            self.vorname_var.set(person_data[0])
-            self.nachname_var.set(person_data[1])
-            self.strasse_var.set(person_data[2])
-            self.plz_var.set(person_data[3])
-            self.ort_var.set(person_data[4])
-            self.telefonnummer_var.set(person_data[5])
-            self.email_var.set(person_data[6])
-
-    def erstelle_gui(self):
-        label_vorname = tk.Label(self, text="Vorname:")
-        label_vorname.grid(row=0, column=0, padx=10, pady=(10, 0))
-        entry_vorname = tk.Entry(self, textvariable=self.vorname_var)
-        entry_vorname.grid(row=0, column=1, padx=10, pady=(10, 0))
-
-        label_nachname = tk.Label(self, text="Nachname:")
-        label_nachname.grid(row=1, column=0, padx=10, pady=5)
-        entry_nachname = tk.Entry(self, textvariable=self.nachname_var)
-        entry_nachname.grid(row=1, column=1, padx=10, pady=5)
-
-        label_strasse = tk.Label(self, text="Straße:")
-        label_strasse.grid(row=2, column=0, padx=10, pady=5)
-        entry_strasse = tk.Entry(self, textvariable=self.strasse_var)
-        entry_strasse.grid(row=2, column=1, padx=10, pady=5)
-
-        label_plz = tk.Label(self, text="PLZ:")
-        label_plz.grid(row=3, column=0, padx=10, pady=5)
-        entry_plz = tk.Entry(self, textvariable=self.plz_var)
-        entry_plz.grid(row=3, column=1, padx=10, pady=5)
-
-        label_ort = tk.Label(self, text="Ort:")
-        label_ort.grid(row=4, column=0, padx=10, pady=5)
-        entry_ort = tk.Entry(self, textvariable=self.ort_var)
-        entry_ort.grid(row=4, column=1, padx=10, pady=5)
-
-        label_telefonnummer = tk.Label(self, text="Telefonnummer:")
-        label_telefonnummer.grid(row=5, column=0, padx=10, pady=5)
-        entry_telefonnummer = tk.Entry(self, textvariable=self.telefonnummer_var)
-        entry_telefonnummer.grid(row=5, column=1, padx=10, pady=5)
-
-        label_email = tk.Label(self, text="E-Mail:")
-        label_email.grid(row=6, column=0, padx=10, pady=5)
-        entry_email = tk.Entry(self, textvariable=self.email_var)
-        entry_email.grid(row=6, column=1, padx=10, pady=5)
-
-        button_frame = tk.Frame(self)
-        button_frame.grid(row=7, columnspan=2, pady=(20, 0))
-        ok_button = tk.Button(button_frame, text="OK", command=self.on_ok_button_click)
-        ok_button.pack(side=tk.LEFT, padx=5)
-        abbrechen_button = tk.Button(button_frame, text="Abbrechen", command=self.destroy)
-        abbrechen_button.pack(side=tk.LEFT, padx=5)
-
-    def validate_plz(self, plz):
-        return re.match(r"^\d{5}$", plz)
-
-    def validate_email(self, email):
-        return re.match(r"[^@]+@[^@]+\.[^@]+", email)
-
-    def on_ok_button_click(self):
-        vorname = self.vorname_var.get()
-        nachname = self.nachname_var.get()
-        strasse = self.strasse_var.get()
-        plz = self.plz_var.get()
-        ort = self.ort_var.get()
-        telefonnummer = self.telefonnummer_var.get()
-        email = self.email_var.get()
-
-        if not self.validate_plz(plz):
-            messagebox.showwarning("Fehler", "Ungültige PLZ. Bitte geben Sie eine 5-stellige Zahl ein.")
-            return
-
-        if not self.validate_email(email):
-            messagebox.showwarning("Fehler", "Ungültige E-Mail-Adresse.")
-            return
-
-        data = [vorname, nachname, strasse, plz, ort, telefonnummer, email]
-
-        if self.bearbeiten:
-            selected_item = self.parent.tabelle.selection()
-            if not selected_item:
-                messagebox.showwarning("Fehler", "Bitte wählen Sie einen Datensatz aus.")
-                return
-
-            index = self.parent.tabelle.index(selected_item)
-            self.parent.tabelle.delete(selected_item)
-            self.parent.tabelle.insert("", index, values=data)
-        else:
-            self.parent.tabelle.insert("", tk.END, values=data)
-
-        with open("personen.csv", "a", newline="", encoding="utf-8-sig") as csvfile:
-            csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(data)
-
-        self.destroy()
 
 class Hauptfenster(tk.Tk):
     def __init__(self):
@@ -143,17 +29,26 @@ class Hauptfenster(tk.Tk):
         self.tabelle.bind("<Double-1>", self.on_table_double_click)
 
 
+    # Das Menü wird erstellt, hier wird "tkinter as tk" verwendet
+    # Beim Aufbau hatte uns Dr. Google geholfen ;-)
     def erstelle_menue(self):
+        #Menubar erzeugen
         menubar = tk.Menu(self)
         self.config(menu=menubar)
-
+        # tearoff ist eine Eigenschaft von Menüs, bei denen Untermenüs verwendet werden.
         eintrag_menu = tk.Menu(menubar, tearoff=0)
+
+        # Menu mit Texten versehen
         menubar.add_cascade(label="Eintrag", menu=eintrag_menu)
-        eintrag_menu.add_command(label="Neu", command=self.neue_person_anlegen)
-        eintrag_menu.add_command(label="Bearbeiten", command=self.person_bearbeiten)
+        eintrag_menu.add_command(label="Neu", command=self.anlegen_neue_person)
+        eintrag_menu.add_command(label="Bearbeiten", command=self.bearbeiten_person)
         eintrag_menu.add_command(label="Löschen", command=self.person_loeschen)
 
+    #Tabelle erstellen
     def erstelle_tabelle(self):
+        # ttk ist eine Methode von tkinter
+        # ttk.Treeview ist ein Widget aus der tkinter-Bibliothek,
+        # das eine tabellarische Ansicht darstellt.
         self.tabelle = ttk.Treeview(self,
                                     columns=("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail"),
                                     show="headings")
@@ -177,7 +72,7 @@ class Hauptfenster(tk.Tk):
 
         self.tabelle.pack(fill=tk.BOTH, expand=True)
 
-        # Ändere den Hintergrund des Headers (Überschriftenzeile) in Grau
+        # Ändere den Hintergrund der Headerspalte (Überschriftenzeile) in Grau
         self.tabelle.tag_configure("header", background="darkgrey", foreground="black")
         for col in ("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail"):
             self.tabelle.heading(col, text=col, anchor=tk.CENTER, command=lambda c=col: self.on_header_click(c))  # Klick-Event hinzufügen
@@ -206,11 +101,15 @@ class Hauptfenster(tk.Tk):
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
 
-    def neue_person_anlegen(self):
+    def anlegen_neue_person(self):
         DialogNeuePerson(self)
 
-    def person_bearbeiten(self):
+    def bearbeiten_person(self):
+        # self.tabelle.selection() ermittelt eine Liste von IDs,
+        # die einer ausgewählten Zeile in der Tabelle entsprechen.
         selected_item = self.tabelle.selection()
+
+        # prüft ob ein Datensatz ausgewählt wurde.
         if not selected_item:
             messagebox.showwarning("Fehler", "Bitte wählen Sie einen Datensatz aus.")
             return
@@ -218,15 +117,20 @@ class Hauptfenster(tk.Tk):
         data = self.tabelle.item(selected_item, "values")
         DialogNeuePerson(self, bearbeiten=True, person_data=data)
 
+    # Datensatz löschen
     def person_loeschen(self):
+        # ermittelt den selektierten Datensatz
         selected_item = self.tabelle.selection()
+
+        # Abfrage, wenn kein Datensatz ausgewählt wurde kann auch nix gelöscht werden
         if not selected_item:
-            messagebox.showwarning("Fehler", "Bitte wählen Sie einen Datensatz aus.")
+            messagebox.showwarning("Fehler", "Bitte einen Datensatz auswählen.")
             return
 
-        # Bestätigungsabfrage anzeigen
+        # Abfragen, ob der Datensatz gelöscht wurde
         result = messagebox.askquestion("Löschen bestätigen", "Wollen Sie den Datensatz wirklich löschen?")
 
+        # Ja oder "Ok" wurde
         if result == "yes":
             index = self.tabelle.index(selected_item)
             self.tabelle.delete(selected_item)
@@ -234,7 +138,7 @@ class Hauptfenster(tk.Tk):
             # Den gelöschten Datensatz aus der Liste entfernen
             self.personen.pop(index)
 
-            # Daten in der CSV-Datei aktualisieren
+            # Daten in der CSV-Datei aktualisieren, dazu die Datei mit der Option "w" öffnen
             with open("personen.csv", "w", newline="", encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
                 for row in self.personen:
@@ -245,11 +149,19 @@ class Hauptfenster(tk.Tk):
         # Hier können Sie Ihren eigenen Sortieralgorithmus implementieren oder die Daten anhand der Spalte sortieren
         # Ich werde hier einfach die Daten nach der geklickten Spalte sortieren und die Tabelle aktualisieren
 
+        # zunächst alle Daten aus der Tabelle abrufen und in Variable speichern
         data = self.tabelle.get_children("")
+        # Die Variable reversed_order speichert den aktuellen Sortierzustand der Spalte.
+        # self.sort_states => Der Sortierzustand wird in diesem Dictionary (self.sort_states) für jede Spalte gespeichert.
+        # Solange die Spalte noch nicht sortiert wurde, wird der Standardwert False verwendet.
+        # False bedeutet dass die Daten aufsteigend sortiert werden sollen.
         reversed_order = self.sort_states.get(col, False)  # Den aktuellen Sortierzustand der Spalte abrufen
+        # sorted() wird verwendet, um die Daten zu sortieren. Der Parameter "key" sagt aus, nach
+        # welchem Wert sortiert werden soll. Hier wird der Wert der ausgewählten Spalte für
+        # jede Zeile als Schlüssel verwendet.
         data = sorted(data, key=lambda item: self.tabelle.set(item, col), reverse=reversed_order)
 
-        # Tabelle löschen und sortierte Daten einfügen
+        # sortierte Daten einfügen
         for i in data:
             self.tabelle.move(i, "", data.index(i))
 
@@ -259,18 +171,22 @@ class Hauptfenster(tk.Tk):
         # Setze Sortiersymbol für die geklickte Spalte und entferne es für die anderen Spalten
         for column in self.tabelle["columns"]:
             if column == col:
-                sort_symbol = " ▼" if reversed_order else " ▲"
+                sort_symbol = " ▼" if reversed_order else " ▲" # Hinzufügen
             else:
-                sort_symbol = ""
+                sort_symbol = "" # Entfernen
             self.tabelle.heading(column, text=column + sort_symbol, anchor=tk.CENTER)
 
 
+    # Python erkennt den Doppelklick durch den event-Handler, der im Konstruktor
+    # deklariert wurde:
+    # self.tabelle.bind("<Double-1>", self.on_table_double_click)
     def on_table_double_click(self, event):
         selected_item = self.tabelle.selection()
         if not selected_item:
             return
 
         data = self.tabelle.item(selected_item, "values")
+        # ruft das Popup auf
         DialogNeuePerson(self, bearbeiten=True, person_data=data)
 
 
