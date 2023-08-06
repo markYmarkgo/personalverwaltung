@@ -1,0 +1,280 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import csv
+import re
+from itertools import islice
+
+class NeuePersonDialog(tk.Toplevel):
+    def __init__(self, parent, bearbeiten=False, person_data=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.bearbeiten = bearbeiten
+        self.person_data = person_data
+
+        self.title("Neue Person anlegen" if not bearbeiten else "Person bearbeiten")
+        self.geometry("400x350")
+
+        self.vorname_var = tk.StringVar()
+        self.nachname_var = tk.StringVar()
+        self.strasse_var = tk.StringVar()
+        self.plz_var = tk.StringVar()
+        self.ort_var = tk.StringVar()
+        self.telefonnummer_var = tk.StringVar()
+        self.email_var = tk.StringVar()
+
+        self.erstelle_gui()
+
+        if bearbeiten and person_data:
+            self.vorname_var.set(person_data[0])
+            self.nachname_var.set(person_data[1])
+            self.strasse_var.set(person_data[2])
+            self.plz_var.set(person_data[3])
+            self.ort_var.set(person_data[4])
+            self.telefonnummer_var.set(person_data[5])
+            self.email_var.set(person_data[6])
+
+    def erstelle_gui(self):
+        label_vorname = tk.Label(self, text="Vorname:")
+        label_vorname.grid(row=0, column=0, padx=10, pady=(10, 0))
+        entry_vorname = tk.Entry(self, textvariable=self.vorname_var)
+        entry_vorname.grid(row=0, column=1, padx=10, pady=(10, 0))
+
+        label_nachname = tk.Label(self, text="Nachname:")
+        label_nachname.grid(row=1, column=0, padx=10, pady=5)
+        entry_nachname = tk.Entry(self, textvariable=self.nachname_var)
+        entry_nachname.grid(row=1, column=1, padx=10, pady=5)
+
+        label_strasse = tk.Label(self, text="Straße:")
+        label_strasse.grid(row=2, column=0, padx=10, pady=5)
+        entry_strasse = tk.Entry(self, textvariable=self.strasse_var)
+        entry_strasse.grid(row=2, column=1, padx=10, pady=5)
+
+        label_plz = tk.Label(self, text="PLZ:")
+        label_plz.grid(row=3, column=0, padx=10, pady=5)
+        entry_plz = tk.Entry(self, textvariable=self.plz_var)
+        entry_plz.grid(row=3, column=1, padx=10, pady=5)
+
+        label_ort = tk.Label(self, text="Ort:")
+        label_ort.grid(row=4, column=0, padx=10, pady=5)
+        entry_ort = tk.Entry(self, textvariable=self.ort_var)
+        entry_ort.grid(row=4, column=1, padx=10, pady=5)
+
+        label_telefonnummer = tk.Label(self, text="Telefonnummer:")
+        label_telefonnummer.grid(row=5, column=0, padx=10, pady=5)
+        entry_telefonnummer = tk.Entry(self, textvariable=self.telefonnummer_var)
+        entry_telefonnummer.grid(row=5, column=1, padx=10, pady=5)
+
+        label_email = tk.Label(self, text="E-Mail:")
+        label_email.grid(row=6, column=0, padx=10, pady=5)
+        entry_email = tk.Entry(self, textvariable=self.email_var)
+        entry_email.grid(row=6, column=1, padx=10, pady=5)
+
+        button_frame = tk.Frame(self)
+        button_frame.grid(row=7, columnspan=2, pady=(20, 0))
+        ok_button = tk.Button(button_frame, text="OK", command=self.on_ok_button_click)
+        ok_button.pack(side=tk.LEFT, padx=5)
+        abbrechen_button = tk.Button(button_frame, text="Abbrechen", command=self.destroy)
+        abbrechen_button.pack(side=tk.LEFT, padx=5)
+
+    def validate_plz(self, plz):
+        return re.match(r"^\d{5}$", plz)
+
+    def validate_email(self, email):
+        return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
+    def on_ok_button_click(self):
+        vorname = self.vorname_var.get()
+        nachname = self.nachname_var.get()
+        strasse = self.strasse_var.get()
+        plz = self.plz_var.get()
+        ort = self.ort_var.get()
+        telefonnummer = self.telefonnummer_var.get()
+        email = self.email_var.get()
+
+        if not self.validate_plz(plz):
+            messagebox.showwarning("Fehler", "Ungültige PLZ. Bitte geben Sie eine 5-stellige Zahl ein.")
+            return
+
+        if not self.validate_email(email):
+            messagebox.showwarning("Fehler", "Ungültige E-Mail-Adresse.")
+            return
+
+        data = [vorname, nachname, strasse, plz, ort, telefonnummer, email]
+
+        if self.bearbeiten:
+            selected_item = self.parent.tabelle.selection()
+            if not selected_item:
+                messagebox.showwarning("Fehler", "Bitte wählen Sie einen Datensatz aus.")
+                return
+
+            index = self.parent.tabelle.index(selected_item)
+            self.parent.tabelle.delete(selected_item)
+            self.parent.tabelle.insert("", index, values=data)
+        else:
+            self.parent.tabelle.insert("", tk.END, values=data)
+
+        with open("personen.csv", "a", newline="", encoding="utf-8-sig") as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow(data)
+
+        self.destroy()
+
+class Hauptfenster(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Personenverwaltung")
+        self.geometry("1300x600")
+
+        # Die Variablen als Attribut der Instanz zuweisen
+        self.sort_reversed = {}
+        self.sort_states = {}
+
+        self.lade_personen()
+        self.erstelle_menue()
+        self.erstelle_tabelle()
+
+        # folgende Zeile hinzu, um das Theme zu ändern
+        style = ttk.Style(self)
+        style.theme_use("clam")
+
+        self.lade_personen()
+
+        # Den on_table_double_click-Handler an den Doppelklick auf die Tabelle binden
+        self.tabelle.bind("<Double-1>", self.on_table_double_click)
+
+
+    def erstelle_menue(self):
+        menubar = tk.Menu(self)
+        self.config(menu=menubar)
+
+        eintrag_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Eintrag", menu=eintrag_menu)
+        eintrag_menu.add_command(label="Neu", command=self.neue_person_anlegen)
+        eintrag_menu.add_command(label="Bearbeiten", command=self.person_bearbeiten)
+        eintrag_menu.add_command(label="Löschen", command=self.person_loeschen)
+
+    def erstelle_tabelle(self):
+        self.tabelle = ttk.Treeview(self,
+                                    columns=("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail"),
+                                    show="headings")
+        self.tabelle.heading("Vorname", text="Vorname", anchor=tk.CENTER, command=lambda: self.on_header_click("Vorname"))
+        self.tabelle.heading("Nachname", text="Nachname", anchor=tk.CENTER, command=lambda: self.on_header_click("Nachname"))
+        self.tabelle.heading("Straße", text="Straße", anchor=tk.CENTER, command=lambda: self.on_header_click("Straße"))
+        self.tabelle.heading("PLZ", text="PLZ", anchor=tk.CENTER, command=lambda: self.on_header_click("PLZ"))
+        self.tabelle.heading("Ort", text="Ort", anchor=tk.CENTER, command=lambda: self.on_header_click("Ort"))
+        self.tabelle.heading("Telefonnummer", text="Telefonnummer", anchor=tk.CENTER, command=lambda: self.on_header_click("Telefonnummer"))
+        self.tabelle.heading("E-Mail", text="E-Mail", anchor=tk.CENTER, command=lambda: self.on_header_click("E-Mail"))
+
+
+        # Breite und Höhe des Header-Elements anpassen
+        self.tabelle.column("Vorname", anchor=tk.CENTER, width=100)
+        self.tabelle.column("Nachname", anchor=tk.CENTER, width=100)
+        self.tabelle.column("Straße", anchor=tk.CENTER, width=150)
+        self.tabelle.column("PLZ", anchor=tk.CENTER, width=80)
+        self.tabelle.column("Ort", anchor=tk.CENTER, width=100)
+        self.tabelle.column("Telefonnummer", anchor=tk.CENTER, width=120)
+        self.tabelle.column("E-Mail", anchor=tk.CENTER, width=150)
+
+        self.tabelle.pack(fill=tk.BOTH, expand=True)
+
+        # Ändere den Hintergrund des Headers (Überschriftenzeile) in Grau
+        self.tabelle.tag_configure("header", background="darkgrey", foreground="black")
+        for col in ("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail"):
+            self.tabelle.heading(col, text=col, anchor=tk.CENTER, command=lambda c=col: self.on_header_click(c))  # Klick-Event hinzufügen
+
+    def lade_personen(self):
+        try:
+            with open("personen.csv", "r", newline="", encoding="utf-8-sig") as csvfile:
+                reader = csv.reader(csvfile)
+                self.personen = list(reader)
+
+                # Lösche alle Daten in der Tabelle, um eine Doppelanzeige zu vermeiden
+                self.tabelle.delete(*self.tabelle.get_children())
+
+                # Überschriften formatieren
+                header = ("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail")
+                for col in header:
+                    self.tabelle.heading(col, text=col, anchor=tk.CENTER)
+                    self.tabelle.column(col, anchor=tk.CENTER, width=100)  # Breite der Spalten anpassen
+
+                # Daten in die Tabelle einfügen
+                for row in self.personen:
+                    self.tabelle.insert("", tk.END, values=row)
+
+        except FileNotFoundError:
+            print("Die Datei personen.csv wurde nicht gefunden.")
+        except Exception as e:
+            print(f"Ein Fehler ist aufgetreten: {e}")
+
+    def neue_person_anlegen(self):
+        NeuePersonDialog(self)
+
+    def person_bearbeiten(self):
+        selected_item = self.tabelle.selection()
+        if not selected_item:
+            messagebox.showwarning("Fehler", "Bitte wählen Sie einen Datensatz aus.")
+            return
+
+        data = self.tabelle.item(selected_item, "values")
+        NeuePersonDialog(self, bearbeiten=True, person_data=data)
+
+    def person_loeschen(self):
+        selected_item = self.tabelle.selection()
+        if not selected_item:
+            messagebox.showwarning("Fehler", "Bitte wählen Sie einen Datensatz aus.")
+            return
+
+        # Bestätigungsabfrage anzeigen
+        result = messagebox.askquestion("Löschen bestätigen", "Wollen Sie den Datensatz wirklich löschen?")
+
+        if result == "yes":
+            index = self.tabelle.index(selected_item)
+            self.tabelle.delete(selected_item)
+
+            # Den gelöschten Datensatz aus der Liste entfernen
+            self.personen.pop(index)
+
+            # Daten in der CSV-Datei aktualisieren
+            with open("personen.csv", "w", newline="", encoding='utf-8') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                for row in self.personen:
+                    csv_writer.writerow(list(row.values()))
+
+
+    def on_header_click(self, col):
+        # Die Methode zum Sortieren der Tabelle nach der geklickten Spalte implementieren
+        # Hier können Sie Ihren eigenen Sortieralgorithmus implementieren oder die Daten anhand der Spalte sortieren
+        # Ich werde hier einfach die Daten nach der geklickten Spalte sortieren und die Tabelle aktualisieren
+
+        data = self.tabelle.get_children("")
+        reversed_order = self.sort_states.get(col, False)  # Den aktuellen Sortierzustand der Spalte abrufen
+        data = sorted(data, key=lambda item: self.tabelle.set(item, col), reverse=reversed_order)
+
+        # Tabelle löschen und sortierte Daten einfügen
+        for i in data:  
+            self.tabelle.move(i, "", data.index(i))
+
+        # Aktualisiere den Sortierzustand der Spalte
+        self.sort_states[col] = not reversed_order
+
+        # Setze Sortiersymbol für die geklickte Spalte und entferne es für die anderen Spalten
+        for column in self.tabelle["columns"]:
+            if column == col:
+                sort_symbol = " ▼" if reversed_order else " ▲"
+            else:
+                sort_symbol = ""
+            self.tabelle.heading(column, text=column + sort_symbol, anchor=tk.CENTER)
+
+
+    def on_table_double_click(self, event):
+        selected_item = self.tabelle.selection()
+        if not selected_item:
+            return
+
+        data = self.tabelle.item(selected_item, "values")
+        NeuePersonDialog(self, bearbeiten=True, person_data=data)
+
+
+if __name__ == "__main__":
+    app = Hauptfenster()
+    app.mainloop()
