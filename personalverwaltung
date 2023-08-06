@@ -4,7 +4,7 @@ import csv
 import re
 from itertools import islice
 
-class NeuePersonDialog(tk.Toplevel):
+class DialogNeuePerson(tk.Toplevel):
     def __init__(self, parent, bearbeiten=False, person_data=None):
         super().__init__(parent)
         self.parent = parent
@@ -207,7 +207,7 @@ class Hauptfenster(tk.Tk):
             print(f"Ein Fehler ist aufgetreten: {e}")
 
     def neue_person_anlegen(self):
-        NeuePersonDialog(self)
+        DialogNeuePerson(self)
 
     def person_bearbeiten(self):
         selected_item = self.tabelle.selection()
@@ -216,7 +216,7 @@ class Hauptfenster(tk.Tk):
             return
 
         data = self.tabelle.item(selected_item, "values")
-        NeuePersonDialog(self, bearbeiten=True, person_data=data)
+        DialogNeuePerson(self, bearbeiten=True, person_data=data)
 
     def person_loeschen(self):
         selected_item = self.tabelle.selection()
@@ -238,8 +238,7 @@ class Hauptfenster(tk.Tk):
             with open("personen.csv", "w", newline="", encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
                 for row in self.personen:
-                    csv_writer.writerow(list(row.values()))
-
+                    csv_writer.writerow(row)  # Schreiben Sie die Liste direkt in die CSV-Datei
 
     def on_header_click(self, col):
         # Die Methode zum Sortieren der Tabelle nach der geklickten Spalte implementieren
@@ -251,7 +250,7 @@ class Hauptfenster(tk.Tk):
         data = sorted(data, key=lambda item: self.tabelle.set(item, col), reverse=reversed_order)
 
         # Tabelle löschen und sortierte Daten einfügen
-        for i in data:  
+        for i in data:
             self.tabelle.move(i, "", data.index(i))
 
         # Aktualisiere den Sortierzustand der Spalte
@@ -272,7 +271,7 @@ class Hauptfenster(tk.Tk):
             return
 
         data = self.tabelle.item(selected_item, "values")
-        NeuePersonDialog(self, bearbeiten=True, person_data=data)
+        DialogNeuePerson(self, bearbeiten=True, person_data=data)
 
 
 if __name__ == "__main__":
