@@ -5,100 +5,100 @@ import csv
 
 # dialogboxen werden erstellt
 class DialogNeuePerson(tk.Toplevel):
-    def __init__(self, parent, bearbeiten=False, person_data=None):
-        super().__init__(parent)
-        self.parent = parent
+    def __init__(self, elternteil, bearbeiten=False, personenDaten=None):
+        super().__init__(elternteil)
+        self.elternteil = elternteil
         self.bearbeiten = bearbeiten
-        self.person_data = person_data
+        self.personenDaten = personenDaten
 
         # Titel vom poup erstellen
         self.title("Neue Person anlegen" if not bearbeiten else "Person bearbeiten")
 
         # hier werden eine Art ID der entsprechenden Textbox abgefragt
-        self.vorname_var = tk.StringVar()
-        self.nachname_var = tk.StringVar()
-        self.strasse_var = tk.StringVar()
-        self.plz_var = tk.StringVar()
-        self.ort_var = tk.StringVar()
-        self.telefonnummer_var = tk.StringVar()
-        self.email_var = tk.StringVar()
+        self.vornameInfo = tk.StringVar()
+        self.nachnameInfo = tk.StringVar()
+        self.strasseInfo = tk.StringVar()
+        self.plzInfo = tk.StringVar()
+        self.ortInfo = tk.StringVar()
+        self.telefonnummerInfo = tk.StringVar()
+        self.emailInfo = tk.StringVar()
 
         # Methode, die die GUI anzeigt wird aufgerufen
-        self.erstelle_gui()
+        self.erstelleGUI()
 
-        # If-statment; prüft ob Daten neu eingegeben oder editiert werden soll
-        if bearbeiten and person_data:
-            self.vorname_var.set(person_data[0])
-            self.nachname_var.set(person_data[1])
-            self.strasse_var.set(person_data[2])
-            self.plz_var.set(person_data[3])
-            self.ort_var.set(person_data[4])
-            self.telefonnummer_var.set(person_data[5])
-            self.email_var.set(person_data[6])
+        # If-statment; prüft ob Daten neu eingegeben oder editiert werden sollen
+        if bearbeiten and personenDaten:
+            self.vornameInfo.set(personenDaten[0])
+            self.nachnameInfo.set(personenDaten[1])
+            self.strasseInfo.set(personenDaten[2])
+            self.plzInfo.set(personenDaten[3])
+            self.ortInfo.set(personenDaten[4])
+            self.telefonnummerInfo.set(personenDaten[5])
+            self.emailInfo.set(personenDaten[6])
 
     # Methode, die die popup GUI erstellt
-    def erstelle_gui(self):
+    def erstelleGUI(self):
 
         #  Label-Text "Vorname" anzeigen. Beschriftung für das Textfeld tk.Entry
-        label_vorname = tk.Label(self, text="Vorname:")
+        labelVorname = tk.Label(self, text="Vorname:")
 
         # grid wird verwendet, um das tk.Label-Widget
-        # mit dem Namen "label_vorname" im übergeordneten Widget
+        # mit dem Namen "labelVorname" im übergeordneten Widget
         # zu platzieren. grid ist eine der drei Methoden in tkinter,
         # die zum Positionieren von Widgets verwendet werden können
-        label_vorname.grid(row=0, column=0, padx=10, pady=(10, 0))
+        labelVorname.grid(row=0, column=0, padx=10, pady=(10, 0))
 
         # tk.Entry ist ein Widget in tkinter , das ein Textfeld
         # darstellt. Der Benutzer kann Text eingeben oder bearbeiten.
-        entry_vorname = tk.Entry(self, textvariable=self.vorname_var)
-        entry_vorname.grid(row=0, column=1, padx=10, pady=(10, 0))
+        entryVorname = tk.Entry(self, textvariable=self.vornameInfo)
+        entryVorname.grid(row=0, column=1, padx=10, pady=(10, 0))
 
-        label_nachname = tk.Label(self, text="Nachname:")
-        label_nachname.grid(row=1, column=0, padx=10, pady=5)
-        entry_nachname = tk.Entry(self, textvariable=self.nachname_var)
-        entry_nachname.grid(row=1, column=1, padx=10, pady=5)
+        labelNachname = tk.Label(self, text="Nachname:")
+        labelNachname.grid(row=1, column=0, padx=10, pady=5)
+        entryNachname = tk.Entry(self, textvariable=self.nachnameInfo)
+        entryNachname.grid(row=1, column=1, padx=10, pady=5)
 
-        label_strasse = tk.Label(self, text="Straße:")
-        label_strasse.grid(row=2, column=0, padx=10, pady=5)
-        entry_strasse = tk.Entry(self, textvariable=self.strasse_var)
-        entry_strasse.grid(row=2, column=1, padx=10, pady=5)
+        labelStrasse = tk.Label(self, text="Straße:")
+        labelStrasse.grid(row=2, column=0, padx=10, pady=5)
+        entryStrasse = tk.Entry(self, textvariable=self.strasseInfo)
+        entryStrasse.grid(row=2, column=1, padx=10, pady=5)
 
-        label_plz = tk.Label(self, text="PLZ:")
-        label_plz.grid(row=3, column=0, padx=10, pady=5)
-        entry_plz = tk.Entry(self, textvariable=self.plz_var)
-        entry_plz.grid(row=3, column=1, padx=10, pady=5)
+        labelPLZ = tk.Label(self, text="PLZ:")
+        labelPLZ.grid(row=3, column=0, padx=10, pady=5)
+        entryPLZ = tk.Entry(self, textvariable=self.plzInfo)
+        entryPLZ.grid(row=3, column=1, padx=10, pady=5)
 
-        label_ort = tk.Label(self, text="Ort:")
-        label_ort.grid(row=4, column=0, padx=10, pady=5)
-        entry_ort = tk.Entry(self, textvariable=self.ort_var)
-        entry_ort.grid(row=4, column=1, padx=10, pady=5)
+        labelOrt = tk.Label(self, text="Ort:")
+        labelOrt.grid(row=4, column=0, padx=10, pady=5)
+        entryOrt = tk.Entry(self, textvariable=self.ortInfo)
+        entryOrt.grid(row=4, column=1, padx=10, pady=5)
 
-        label_telefonnummer = tk.Label(self, text="Telefonnummer:")
-        label_telefonnummer.grid(row=5, column=0, padx=10, pady=5)
-        entry_telefonnummer = tk.Entry(self, textvariable=self.telefonnummer_var)
-        entry_telefonnummer.grid(row=5, column=1, padx=10, pady=5)
+        labelTelefonnummer = tk.Label(self, text="Telefonnummer:")
+        labelTelefonnummer.grid(row=5, column=0, padx=10, pady=5)
+        entryTelefonnummer = tk.Entry(self, textvariable=self.telefonnummerInfo)
+        entryTelefonnummer.grid(row=5, column=1, padx=10, pady=5)
 
-        label_email = tk.Label(self, text="E-Mail:")
-        label_email.grid(row=6, column=0, padx=10, pady=5)
-        entry_email = tk.Entry(self, textvariable=self.email_var)
-        entry_email.grid(row=6, column=1, padx=10, pady=5)
+        labelEmail = tk.Label(self, text="E-Mail:")
+        labelEmail.grid(row=6, column=0, padx=10, pady=5)
+        entryEmail = tk.Entry(self, textvariable=self.emailInfo)
+        entryEmail.grid(row=6, column=1, padx=10, pady=5)
 
-        button_frame = tk.Frame(self)
-        button_frame.grid(row=7, columnspan=2, pady=(20, 0))
-        ok_button = tk.Button(button_frame, text="OK", command=self.on_ok_button_click)
-        ok_button.pack(side=tk.LEFT, padx=5)
-        abbrechen_button = tk.Button(button_frame, text="Abbrechen", command=self.destroy)
-        abbrechen_button.pack(side=tk.LEFT, padx=5)
+        buttonFrame = tk.Frame(self)
+        buttonFrame.grid(row=7, columnspan=2, pady=(20, 0))
+        okButton = tk.Button(buttonFrame, text="OK", command=self.onOkButtonClick)
+        okButton.pack(side=tk.LEFT, padx=5)
+        abbrechenButton = tk.Button(buttonFrame, text="Abbrechen", command=self.destroy)
+        abbrechenButton.pack(side=tk.LEFT, padx=5)
 
-    def validate_phone_number(self, phone_number):
+    def validatetelefonNummer(self, telefonNummer):
         # ^: Steht für den Anfang des Strings.Stellt sicher, dass der gesamte String mit dem Muster übereinstimmt.
         # $: Steht für das Ende des Strings.
         # [\d/-]+: [\d] ist eine Zeichenklasse, die jede Ziffer von 0 bis 9.
         # [-/] ist eine Zeichenklasse, die entweder "-" oder "/" erlaubt.
         # Das "+" bedeutet, dass mindestens solch ein Zeichen vorhanden sein muss.
-        return re.match(r"^[\d/-]+$", phone_number)
+        return re.match(r"^[\d/-]+$", telefonNummer)
 
-    def validate_plz(self, plz):
+    def validatePLZ(self, plz):
         # ^: Steht für den Anfang des Strings. Es stellt sicher,
         # dass der gesamte String mit dem Muster übereinstimmt.
         # $: Steht für das Ende des Strings.
@@ -107,7 +107,7 @@ class DialogNeuePerson(tk.Toplevel):
         # fünf aufeinanderfolgende Ziffern vorhanden sein müssen.
         return re.match(r"^\d{5}$", plz)
 
-    def validate_email(self, email):
+    def validatEmail(self, email):
         # [^@]+: Steht für eine Stringklasse, die jedes Zeichen
         # außer dem Zeichen @ darstellt. Das + bedeutet, dass
         # mindestens ein solches Zeichen vorhanden sein muss
@@ -118,39 +118,39 @@ class DialogNeuePerson(tk.Toplevel):
         return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
     # Wenn der OK Button beim popup geklickt wird
-    def on_ok_button_click(self):
+    def onOkButtonClick(self):
         # die Variablen wurden im Konstruktor (__init__) deklariert
         # mittels ".get()" wird der Inhalt der Textbox geholt
-        vorname = self.vorname_var.get()
-        nachname = self.nachname_var.get()
-        strasse = self.strasse_var.get()
-        plz = self.plz_var.get()
-        ort = self.ort_var.get()
-        telefonnummer = self.telefonnummer_var.get()
-        email = self.email_var.get()
+        vorname = self.vornameInfo.get()
+        nachname = self.nachnameInfo.get()
+        strasse = self.strasseInfo.get()
+        plz = self.plzInfo.get()
+        ort = self.ortInfo.get()
+        telefonnummer = self.telefonnummerInfo.get()
+        email = self.emailInfo.get()
 
         # Im folgenden wird PLZ, E-Mail und Telefonnummer nach der Validierung gefragt
-        if not self.validate_plz(plz):
+        if not self.validatePLZ(plz):
             messagebox.showwarning("Fehler", "Ungültige PLZ. Bitte geben Sie eine 5-stellige Zahl ein.")
             # self.grab_set() => Das Hauptfenster blockieren, keine Interaktionen mit
             # dem Hauptfenster möglich solange das aktuelle Popupfenster geöffnet ist.
             self.grab_set()
-            # self.wait_window() => Das Hauptfenster so lange blockieren,
+            # self.waitWindow() => Das Hauptfenster so lange blockieren,
             # bis das Popupfenster geschlossen wird.
-            self.wait_window()  # solange warten bis das Popup geschlossen wird
+            self.waitWindow()  # solange warten bis das Popup geschlossen wird
             return
 
-        if not self.validate_email(email):
+        if not self.validatEmail(email):
             messagebox.showwarning("Fehler", "Ungültige E-Mail-Adresse.")
             self.grab_set()  # das Popup blockieren
-            self.wait_window()  # # solange warten bis das Popup geschlossen wird
+            self.waitWindow()  # # solange warten bis das Popup geschlossen wird
             return
 
-        if not self.validate_phone_number(telefonnummer):
+        if not self.validatetelefonNummer(telefonnummer):
             messagebox.showwarning("Fehler",
                                    "Ungültige Telefonnummer. Erlaubt sind nur Zahlen und die Zeichen '-' oder '/'")
             self.grab_set()  # das Popup blockieren
-            self.wait_window()  # solange warten bis das Popup geschlossen wird
+            self.waitWindow()  # solange warten bis das Popup geschlossen wird
             return
 
         # Sobald die Validierung erfolgreich ist, werden die Daten gspeichert und das Popup geschlossenn
@@ -162,21 +162,21 @@ class DialogNeuePerson(tk.Toplevel):
         # oder im Modus "Neue Person anlegen" geöffnet wurde.
         if self.bearbeiten:
             # im Bearbeiten Modus
-            selected_item = self.parent.tabelle.selection()
+            selected_item = self.elternteil.tabelle.selection()
             if not selected_item:
                 messagebox.showwarning("Datensatz auswählen", "Bitte wählen Sie einen Datensatz aus.")
                 return
 
-            index = self.parent.tabelle.index(selected_item)
-            self.parent.tabelle.delete(selected_item)
-            self.parent.tabelle.insert("", index, values = data)
+            index = self.elternteil.tabelle.index(selected_item)
+            self.elternteil.tabelle.delete(selected_item)
+            self.elternteil.tabelle.insert("", index, values = data)
         else:
             # Im Neu anlegen Modus
-            self.parent.tabelle.insert("", tk.END, values = data)
+            self.elternteil.tabelle.insert("", tk.END, values = data)
 
         # Datei personen.csv öffnen und Daten Speichern
         with open("personen.csv", "a", newline="", encoding="utf-8-sig") as csvfile:
-            csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(data)
+            csvWriter = csv.writer(csvfile)
+            csvWriter.writerow(data)
 
         self.destroy()
