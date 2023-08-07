@@ -15,23 +15,23 @@ class Hauptfenster(tk.Tk):
         self.sort_reversed = {}
         self.sort_states = {}
 
-        self.lade_personen()
-        self.erstelle_menue()
-        self.erstelle_tabelle()
+        self.ladePersonen()
+        self.erstelleMenue()
+        self.erstelleTabelle()
 
         # folgende Zeile hinzu, um das Theme zu ändern
         style = ttk.Style(self)
         style.theme_use("clam")
 
-        self.lade_personen()
+        self.ladePersonen()
 
-        # Den on_table_double_click-Handler an den Doppelklick auf die Tabelle binden
-        self.tabelle.bind("<Double-1>", self.on_table_double_click)
+        # Den beimTabellenDoppelKlick-Handler an den Doppelklick auf die Tabelle binden
+        self.tabelle.bind("<Double-1>", self.beimTabellenDoppelKlick)
 
 
     # Das Menü wird erstellt, hier wird "tkinter as tk" verwendet
     # Beim Aufbau hatte uns Dr. Google geholfen ;-)
-    def erstelle_menue(self):
+    def erstelleMenue(self):
         #Menubar erzeugen
         menubar = tk.Menu(self)
         self.config(menu=menubar)
@@ -40,25 +40,25 @@ class Hauptfenster(tk.Tk):
 
         # Menu mit Texten versehen
         menubar.add_cascade(label="Eintrag", menu=eintrag_menu)
-        eintrag_menu.add_command(label="Neu", command=self.anlegen_neue_person)
-        eintrag_menu.add_command(label="Bearbeiten", command=self.bearbeiten_person)
-        eintrag_menu.add_command(label="Löschen", command=self.person_loeschen)
+        eintrag_menu.add_command(label="Neu", command=self.anlegenNeuePerson)
+        eintrag_menu.add_command(label="Bearbeiten", command=self.personBearbeiten)
+        eintrag_menu.add_command(label="Löschen", command=self.personLoeschen)
 
     #Tabelle erstellen
-    def erstelle_tabelle(self):
+    def erstelleTabelle(self):
         # ttk ist eine Methode von tkinter
         # ttk.Treeview ist ein Widget aus der tkinter-Bibliothek,
         # das eine tabellarische Ansicht darstellt.
         self.tabelle = ttk.Treeview(self,
                                     columns=("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail"),
                                     show="headings")
-        self.tabelle.heading("Vorname", text="Vorname", anchor=tk.CENTER, command=lambda: self.on_header_click("Vorname"))
-        self.tabelle.heading("Nachname", text="Nachname", anchor=tk.CENTER, command=lambda: self.on_header_click("Nachname"))
-        self.tabelle.heading("Straße", text="Straße", anchor=tk.CENTER, command=lambda: self.on_header_click("Straße"))
-        self.tabelle.heading("PLZ", text="PLZ", anchor=tk.CENTER, command=lambda: self.on_header_click("PLZ"))
-        self.tabelle.heading("Ort", text="Ort", anchor=tk.CENTER, command=lambda: self.on_header_click("Ort"))
-        self.tabelle.heading("Telefonnummer", text="Telefonnummer", anchor=tk.CENTER, command=lambda: self.on_header_click("Telefonnummer"))
-        self.tabelle.heading("E-Mail", text="E-Mail", anchor=tk.CENTER, command=lambda: self.on_header_click("E-Mail"))
+        self.tabelle.heading("Vorname", text="Vorname", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("Vorname"))
+        self.tabelle.heading("Nachname", text="Nachname", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("Nachname"))
+        self.tabelle.heading("Straße", text="Straße", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("Straße"))
+        self.tabelle.heading("PLZ", text="PLZ", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("PLZ"))
+        self.tabelle.heading("Ort", text="Ort", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("Ort"))
+        self.tabelle.heading("Telefonnummer", text="Telefonnummer", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("Telefonnummer"))
+        self.tabelle.heading("E-Mail", text="E-Mail", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("E-Mail"))
 
 
         # Breite und Höhe des Header-Elements anpassen
@@ -75,9 +75,9 @@ class Hauptfenster(tk.Tk):
         # Ändere den Hintergrund der Headerspalte (Überschriftenzeile) in Grau
         self.tabelle.tag_configure("header", background="darkgrey", foreground="black")
         for col in ("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail"):
-            self.tabelle.heading(col, text=col, anchor=tk.CENTER, command=lambda c=col: self.on_header_click(c))  # Klick-Event hinzufügen
+            self.tabelle.heading(col, text=col, anchor=tk.CENTER, command=lambda c=col: self.beimTabellenHeaderKlick(c))  # Klick-Event hinzufügen
 
-    def lade_personen(self):
+    def ladePersonen(self):
         try:
             with open("personen.csv", "r", newline="", encoding="utf-8-sig") as csvfile:
                 reader = csv.reader(csvfile)
@@ -101,10 +101,10 @@ class Hauptfenster(tk.Tk):
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
 
-    def anlegen_neue_person(self):
+    def anlegenNeuePerson(self):
         DialogNeuePerson(self)
 
-    def bearbeiten_person(self):
+    def personBearbeiten(self):
         # self.tabelle.selection() ermittelt eine Liste von IDs,
         # die einer ausgewählten Zeile in der Tabelle entsprechen.
         selected_item = self.tabelle.selection()
@@ -115,10 +115,10 @@ class Hauptfenster(tk.Tk):
             return
 
         data = self.tabelle.item(selected_item, "values")
-        DialogNeuePerson(self, bearbeiten=True, person_data=data)
+        DialogNeuePerson(self, bearbeiten=True, personendaten=data)
 
     # Datensatz löschen
-    def person_loeschen(self):
+    def personLoeschen(self):
         # ermittelt den selektierten Datensatz
         selected_item = self.tabelle.selection()
 
@@ -144,7 +144,7 @@ class Hauptfenster(tk.Tk):
                 for row in self.personen:
                     csv_writer.writerow(row)  # Schreiben Sie die Liste direkt in die CSV-Datei
 
-    def on_header_click(self, col):
+    def beimTabellenHeaderKlick(self, col):
         # Die Methode zum Sortieren der Tabelle nach der geklickten Spalte implementieren
         # Hier können Sie Ihren eigenen Sortieralgorithmus implementieren oder die Daten anhand der Spalte sortieren
         # Ich werde hier einfach die Daten nach der geklickten Spalte sortieren und die Tabelle aktualisieren
@@ -179,15 +179,15 @@ class Hauptfenster(tk.Tk):
 
     # Python erkennt den Doppelklick durch den event-Handler, der im Konstruktor
     # deklariert wurde:
-    # self.tabelle.bind("<Double-1>", self.on_table_double_click)
-    def on_table_double_click(self, event):
+    # self.tabelle.bind("<Double-1>", self.beimTabellenDoppelKlick)
+    def beimTabellenDoppelKlick(self, event):
         selected_item = self.tabelle.selection()
         if not selected_item:
             return
 
         data = self.tabelle.item(selected_item, "values")
         # ruft das Popup auf
-        DialogNeuePerson(self, bearbeiten=True, person_data=data)
+        DialogNeuePerson(self, bearbeiten=True, personenDaten=data)
 
 
 if __name__ == "__main__":
