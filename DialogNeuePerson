@@ -90,7 +90,7 @@ class DialogNeuePerson(tk.Toplevel):
         abbrechenButton = tk.Button(buttonFrame, text="Abbrechen", command=self.destroy)
         abbrechenButton.pack(side=tk.LEFT, padx=5)
 
-    def validatetelefonNummer(self, telefonNummer):
+    def validateTelefonNummer(self, telefonNummer):
         # ^: Steht für den Anfang des Strings.Stellt sicher, dass der gesamte String mit dem Muster übereinstimmt.
         # $: Steht für das Ende des Strings.
         # [\d/-]+: [\d] ist eine Zeichenklasse, die jede Ziffer von 0 bis 9.
@@ -146,7 +146,7 @@ class DialogNeuePerson(tk.Toplevel):
             self.waitWindow()  # # solange warten bis das Popup geschlossen wird
             return
 
-        if not self.validatetelefonNummer(telefonnummer):
+        if not self.validateTelefonNummer(telefonnummer):
             messagebox.showwarning("Fehler",
                                    "Ungültige Telefonnummer. Erlaubt sind nur Zahlen und die Zeichen '-' oder '/'")
             self.grab_set()  # das Popup blockieren
