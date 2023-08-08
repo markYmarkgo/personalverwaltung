@@ -15,6 +15,7 @@ class DialogNeuePerson(tk.Toplevel):
         self.title("Neue Person anlegen" if not bearbeiten else "Person bearbeiten")
 
         # hier werden eine Art ID der entsprechenden Textbox abgefragt
+        print("Vornameinfo",tk.StringVar())
         self.vornameInfo = tk.StringVar()
         self.nachnameInfo = tk.StringVar()
         self.strasseInfo = tk.StringVar()
@@ -38,6 +39,7 @@ class DialogNeuePerson(tk.Toplevel):
 
     # Methode, die die popup GUI erstellt
     def erstelleGUI(self):
+        self.geometry("400x400")
 
         #  Label-Text "Vorname" anzeigen. Beschriftung für das Textfeld tk.Entry
         labelVorname = tk.Label(self, text="Vorname:")
@@ -169,12 +171,13 @@ class DialogNeuePerson(tk.Toplevel):
 
             index = self.elternteil.tabelle.index(selected_item)
             self.elternteil.tabelle.delete(selected_item)
-            self.elternteil.tabelle.insert("", index, values = data)
+            self.elternteil.tabelle.insert("", index, values=data)
         else:
             # Im Neu anlegen Modus
-            self.elternteil.tabelle.insert("", tk.END, values = data)
+            self.elternteil.personen.append(data)  # Daten zur Liste hinzufügen
+            self.elternteil.tabelle.insert("", tk.END, values=data)  # Tabelle aktualisieren
 
-        # Datei personen.csv öffnen und Daten Speichern
+            # Datei personen.csv öffnen und Daten speichern
         with open("personen.csv", "a", newline="", encoding="utf-8-sig") as csvfile:
             csvWriter = csv.writer(csvfile)
             csvWriter.writerow(data)
