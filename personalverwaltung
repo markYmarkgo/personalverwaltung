@@ -115,7 +115,7 @@ class Hauptfenster(tk.Tk):
             return
 
         data = self.tabelle.item(selected_item, "values")
-        DialogNeuePerson(self, bearbeiten=True, personendaten=data)
+        DialogNeuePerson(self, bearbeiten=True, personenDaten=data)
 
     # Datensatz löschen
     def personLoeschen(self):
