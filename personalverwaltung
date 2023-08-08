@@ -8,16 +8,19 @@ from DialogNeuePerson import DialogNeuePerson
 class Hauptfenster(tk.Tk):
     def __init__(self):
         super().__init__()
+        # Der Title wird auf der MAC zweifach angezeigt
         self.title("Personenverwaltung")
-        self.geometry("1300x600")
+        self.geometry("1400x600")
 
         # Die Variablen als Attribut der Instanz zuweisen
+        # tkinter benötigt diese Variblen zu sortieren
         self.sort_reversed = {}
         self.sort_states = {}
 
+        self.erstelleTabelle()
         self.ladePersonen()
         self.erstelleMenue()
-        self.erstelleTabelle()
+
 
         # folgende Zeile hinzu, um das Theme zu ändern
         style = ttk.Style(self)
@@ -60,16 +63,7 @@ class Hauptfenster(tk.Tk):
         self.tabelle.heading("Telefonnummer", text="Telefonnummer", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("Telefonnummer"))
         self.tabelle.heading("E-Mail", text="E-Mail", anchor=tk.CENTER, command=lambda: self.beimTabellenHeaderKlick("E-Mail"))
 
-
-        # Breite und Höhe des Header-Elements anpassen
-        self.tabelle.column("Vorname", anchor=tk.CENTER, width=100)
-        self.tabelle.column("Nachname", anchor=tk.CENTER, width=100)
-        self.tabelle.column("Straße", anchor=tk.CENTER, width=150)
-        self.tabelle.column("PLZ", anchor=tk.CENTER, width=80)
-        self.tabelle.column("Ort", anchor=tk.CENTER, width=100)
-        self.tabelle.column("Telefonnummer", anchor=tk.CENTER, width=120)
-        self.tabelle.column("E-Mail", anchor=tk.CENTER, width=150)
-
+        # die Tabelle anzeigen
         self.tabelle.pack(fill=tk.BOTH, expand=True)
 
         # Ändere den Hintergrund der Headerspalte (Überschriftenzeile) in Grau
@@ -79,25 +73,29 @@ class Hauptfenster(tk.Tk):
 
     def ladePersonen(self):
         try:
+            # with : Die Datei wird automatisch geschlossen, wenn der Block verlassen wird
             with open("personen.csv", "r", newline="", encoding="utf-8-sig") as csvfile:
+                # Die Variable csv in dem Code stammt aus dem Modul csv, das ein
+                # eingebautes Python-Modul ist und für das Lesen und Schreiben von
+                # CSV-Dateien verwendet wird.
                 reader = csv.reader(csvfile)
                 self.personen = list(reader)
 
                 # Lösche alle Daten in der Tabelle, um eine Doppelanzeige zu vermeiden
+                # Beim Entwickeln gab einen Fehler. Es wurde die Datensätzte 2 mal angezeigt
+                #Mit dieser Zeilen wurde das Problem gelöst, Die folgene Zeile braucht man nicht mehr
                 self.tabelle.delete(*self.tabelle.get_children())
 
                 # Überschriften formatieren
                 header = ("Vorname", "Nachname", "Straße", "PLZ", "Ort", "Telefonnummer", "E-Mail")
                 for col in header:
                     self.tabelle.heading(col, text=col, anchor=tk.CENTER)
-                    self.tabelle.column(col, anchor=tk.CENTER, width=100)  # Breite der Spalten anpassen
+                 #   self.tabelle.column(col, anchor=tk.CENTER, width=100)  # Breite der Spalten anpassen
 
                 # Daten in die Tabelle einfügen
                 for row in self.personen:
                     self.tabelle.insert("", tk.END, values=row)
-
-        except FileNotFoundError:
-            print("Die Datei personen.csv wurde nicht gefunden.")
+        # e enthält die Fehler von Python und die wird in print ausgegeben
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
 
@@ -140,7 +138,11 @@ class Hauptfenster(tk.Tk):
 
             # Daten in der CSV-Datei aktualisieren, dazu die Datei mit der Option "w" öffnen
             with open("personen.csv", "w", newline="", encoding='utf-8') as csvfile:
+                # Die Variable csv in dem Code stammt aus dem Modul csv, das ein
+                # eingebautes Python-Modul ist und für das Lesen und Schreiben von
+                # CSV-Dateien verwendet wird.
                 csv_writer = csv.writer(csvfile)
+
                 for row in self.personen:
                     csv_writer.writerow(row)  # Schreiben Sie die Liste direkt in die CSV-Datei
 
@@ -150,6 +152,7 @@ class Hauptfenster(tk.Tk):
         # Ich werde hier einfach die Daten nach der geklickten Spalte sortieren und die Tabelle aktualisieren
 
         # zunächst alle Daten aus der Tabelle abrufen und in Variable speichern
+        # Diese Daten braucht man zu sortieren
         data = self.tabelle.get_children("")
         # Die Variable reversed_order speichert den aktuellen Sortierzustand der Spalte.
         # self.sort_states => Der Sortierzustand wird in diesem Dictionary (self.sort_states) für jede Spalte gespeichert.
